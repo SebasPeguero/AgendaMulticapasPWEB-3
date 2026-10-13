@@ -26,10 +26,43 @@ document.addEventListener('DOMContentLoaded', () => {
   function configurarEventos() {
     contactForm.addEventListener('submit', manejarEnvioFormulario);
     searchInput.addEventListener('input', manejarBusqueda);
+    inputTelefono.addEventListener('input', manejarFormatoTelefono);
     btnRefresh.addEventListener('click', () => {
       searchInput.value = '';
       obtenerYRenderizar();
     });
+  }
+
+  function manejarFormatoTelefono() {
+    inputTelefono.value = formatearTelefono(inputTelefono.value);
+  }
+
+  function formatearTelefono(valor) {
+    if (!valor) return '';
+    const empiezaConMas = valor.trim().startsWith('+');
+    let digitos = valor.replace(/\D/g, '');
+    if (!digitos) return empiezaConMas ? '+' : '';
+    if (digitos.length > 11) digitos = digitos.substring(0, 11);
+
+    if (digitos.length === 11 || (empiezaConMas && digitos.length > 3)) {
+      const pais = digitos.charAt(0);
+      const p1 = digitos.substring(1, 4);
+      const p2 = digitos.substring(4, 7);
+      const p3 = digitos.substring(7);
+      let res = `+${pais}`;
+      if (p1) res += `-${p1}`;
+      if (p2) res += `-${p2}`;
+      if (p3) res += `-${p3}`;
+      return res;
+    }
+
+    if (digitos.length <= 3) {
+      return digitos;
+    } else if (digitos.length <= 6) {
+      return `${digitos.substring(0, 3)}-${digitos.substring(3)}`;
+    } else {
+      return `${digitos.substring(0, 3)}-${digitos.substring(3, 6)}-${digitos.substring(6)}`;
+    }
   }
 
   async function obtenerYRenderizar() {
